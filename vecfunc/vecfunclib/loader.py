@@ -40,8 +40,7 @@ write_req = (*read_req, 'W')
 
 
 module_template = "vecfunc_%sd_%s.so"
-subpath_options = ("../vecfunclib/bin", "../vecfunclib", "../bin", "..",
-                   "./vecfunclib/bin", "./vecfunclib", "./bin", ".")
+subpath_options = "vecfunclib/bin", "vecfunclib", "bin", "."
 
 
 __lib__ = {}
@@ -56,12 +55,14 @@ def force_compile(force=True):
 def locate_lib_path(fname):
     """ Locate a file in the optional sub-folders"""
     curpath = os.path.dirname(os.path.abspath(__file__))
-    
-    for subpath in subpath_options:
-        file_path = os.path.join(curpath, subpath, fname)
-        if os.path.isfile(file_path):
-            return os.path.normpath(file_path)
-    
+
+    while curpath != '/':
+        for subpath in subpath_options:
+            file_path = os.path.join(curpath, subpath, fname)
+            if os.path.isfile(file_path):
+                return file_path
+        curpath = os.path.normpath(os.path.join(curpath, '..'))
+
     return None
 
 

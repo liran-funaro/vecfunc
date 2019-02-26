@@ -17,7 +17,7 @@ Vectorized function representation for a generic function.
 In addition, an implementation of Bresenham's line algorithm in N-dimensions is included.
 
 
-# Requirements
+# Install (beta)
 Install `g++-8`:
 ```bash
 apt-get install g++-8 
@@ -28,9 +28,10 @@ To precompile for all data types and for all dimensions, use the included script
 
 See Python's requirements in the [REQUIREMENTS](REQUIREMENTS.txt) file.
 
-
-# Install (beta)
-`python setup.py develop --user`
+Finally, install the package in developer mode:
+```bash
+python setup.py develop --user
+```
 
 
 # License

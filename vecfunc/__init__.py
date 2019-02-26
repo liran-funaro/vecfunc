@@ -18,7 +18,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
-from vecfunc import loader, vecfunclib, visualize, rand, vecinterp
+from vecfunc import vecfunclib, visualize, rand, vecinterp
+from vecfunc.vecfunclib import loader
 
 
 def vecfunc(f, require_write=False):
