@@ -7,8 +7,8 @@ OBJ_DIR=obj
 BIN_DIR=bin
 CC=g++-8
 
-CPP_FILES=$(shell find . -type f -name '*.cpp' -not -path "./old/*")
-HEADER_FILES=$(shell find . -type f \( -iname \*.hpp -o -iname \*.h \) -not -path "./old/*")
+CPP_FILES=$(shell find . -type f -name '*.cpp')
+HEADER_FILES=$(shell find . -type f \( -iname \*.hpp -o -iname \*.h \))
 
 INCLUDE_FOLDERS=$(shell find . -type d -name 'include')
 SRC_FOLDERS=$(shell find . -type d -name 'src')
