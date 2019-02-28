@@ -101,6 +101,21 @@ def make_lib(ndim, dtype):
         raise RuntimeError("Could not compile module for the parameters: %s." % params_str)
 
 
+def get_types(ndim, dtype):
+    return dict(
+        vec_size_t=ctypes.c_uint32 * ndim,
+        vecfunc_type=np.ctypeslib.ndpointer(dtype=dtype, ndim=ndim, flags=read_req),
+        vecfunc_gradient_type=np.ctypeslib.ndpointer(dtype=dtype, ndim=ndim + 1, flags=write_req),
+        pts_type=np.ctypeslib.ndpointer(dtype='float64', ndim=2, flags=read_req),
+        interp_res_type=np.ctypeslib.ndpointer(dtype='float64', ndim=1, flags=write_req),
+        cdfs_arr_type=ctypes.POINTER(ctypes.c_double) * ndim,
+
+        vecfunc_type_1d=np.ctypeslib.ndpointer(dtype=dtype, ndim=1, flags=read_req),
+        cdf_type=np.ctypeslib.ndpointer(dtype='float64', ndim=1, flags=read_req),
+        ret_cumsum_type=np.ctypeslib.ndpointer(dtype='float64', ndim=1, flags=write_req),
+    )
+
+
 def load_lib(ndim, dtype):
     """ Loads and initialize a module library, or use already loaded module """
     ndim, dtype = normalize_parameters(ndim, dtype)
@@ -120,42 +135,31 @@ def load_lib(ndim, dtype):
             raise RuntimeError("No module was compiled for the parameters: %s." % params_str)
     lib = ctypes.cdll.LoadLibrary(dll_path)
 
-    # Init types
-    vec_size_t = ctypes.c_uint32 * ndim
-    vecfunc_type = np.ctypeslib.ndpointer(dtype=dtype, ndim=ndim, flags=read_req)
-    vecfunc_gradient_type = np.ctypeslib.ndpointer(dtype=dtype, ndim=ndim + 1, flags=write_req)
-    pts_type = np.ctypeslib.ndpointer(dtype='float64', ndim=2, flags=read_req)
-    interp_res_type = np.ctypeslib.ndpointer(dtype='float64', ndim=1, flags=write_req)
-    cdfs_arr_type = ctypes.POINTER(ctypes.c_double) * ndim
-
-    vecfunc_type_1d = np.ctypeslib.ndpointer(dtype=dtype, ndim=1, flags=read_req)
-    cdf_type = np.ctypeslib.ndpointer(dtype='float64', ndim=1, flags=read_req)
-    ret_cumsum_type = np.ctypeslib.ndpointer(dtype='float64', ndim=1, flags=write_req)
+    t = get_types(ndim, dtype)
 
     # Vecfunc init functions
-    lib.is_rising.argtypes = (vecfunc_type, vec_size_t)
+    lib.is_rising.argtypes = (t['vecfunc_type'], t['vec_size_t'])
     lib.is_rising.restype = ctypes.c_bool
 
-    lib.fix_rising.argtypes = (vecfunc_type, vec_size_t)
+    lib.fix_rising.argtypes = (t['vecfunc_type'], t['vec_size_t'])
 
-    lib.fix_concave_rising.argtypes = (vecfunc_type, vec_size_t)
+    lib.fix_concave_rising.argtypes = (t['vecfunc_type'], t['vec_size_t'])
 
-    lib.calc_gradients.argtypes = (vecfunc_type, vec_size_t, vecfunc_gradient_type, ctypes.c_uint32)
+    lib.calc_gradients.argtypes = (t['vecfunc_type'], t['vec_size_t'], t['vecfunc_gradient_type'], ctypes.c_uint32)
 
-    lib.interp.argtypes = (vecfunc_type, vec_size_t, pts_type, interp_res_type, ctypes.c_uint32)
-    lib.interp_triangulate.argtypes = (vecfunc_type, vec_size_t, pts_type, interp_res_type, ctypes.c_uint32)
+    lib.interp.argtypes = (t['vecfunc_type'], t['vec_size_t'], t['pts_type'], t['interp_res_type'], ctypes.c_uint32)
+    lib.interp_triangulate.argtypes = (t['vecfunc_type'], t['vec_size_t'], t['pts_type'], t['interp_res_type'],
+                                       ctypes.c_uint32)
 
-    lib.expected_value.argtypes = (vecfunc_type, vec_size_t, cdfs_arr_type, vec_size_t)
+    lib.expected_value.argtypes = (t['vecfunc_type'], t['vec_size_t'], t['cdfs_arr_type'], t['vec_size_t'])
     lib.expected_value.restype = ctypes.c_double
 
-    lib.expected_value_1d.argtypes = (vecfunc_type_1d, ctypes.c_uint32, cdf_type, ctypes.c_uint32)
+    lib.expected_value_1d.argtypes = (t['vecfunc_type_1d'], ctypes.c_uint32, t['cdf_type'], ctypes.c_uint32)
     lib.expected_value_1d.restype = ctypes.c_double
 
-    lib.expected_value_cumsum.argtypes = (vecfunc_type_1d, ctypes.c_uint32, cdf_type, ctypes.c_uint32, ret_cumsum_type)
+    lib.expected_value_cumsum.argtypes = (t['vecfunc_type_1d'], ctypes.c_uint32, t['cdf_type'], ctypes.c_uint32,
+                                          t['ret_cumsum_type'])
 
-    ret = lib, dict(
-        vec_size_t=vec_size_t,
-        cdfs_arr_type=cdfs_arr_type,
-    )
+    ret = lib, t
     __lib__[key] = ret
     return ret

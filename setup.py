@@ -38,5 +38,5 @@ setup(
         "Operating System :: OS Independent",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
-    install_requires=['numpy', 'msgpack', 'msgpack-numpy', 'matplotlib', 'scipy', 'seaborn', 'sympy'],
+    install_requires=['numpy', 'matplotlib', 'scipy', 'seaborn', 'sympy'],
 )
