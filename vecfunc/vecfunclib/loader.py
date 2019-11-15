@@ -93,10 +93,11 @@ def make_lib(ndim, dtype):
     params_str = "(dim=%s, value=%s)" % (ndim, dtype)
     cmd = "make dim=%s value=%s" % (ndim, dtype)
     caller = inspect.stack()[2]
-    print("Building vecfunc module for: %s. CMD: %s. Called from: %s (%s)." % (params_str, cmd, caller[1], caller[2]),
-          file=sys.stderr)
+    print(f"Building vecfunc module for: {params_str}. "
+          f"CMD: {cmd}. Called from: {caller[1]} ({caller[2]}). "
+          f"In folder: {cwd}.", file=sys.stderr)
     ret = subprocess.run(cmd, shell=True, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    if ret.stderr:
+    if ret.stderr or ret.returncode != 0:
         print(str(ret.stderr, 'utf-8'), file=sys.stderr)
         raise RuntimeError("Could not compile module for the parameters: %s." % params_str)
 

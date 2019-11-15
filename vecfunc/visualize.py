@@ -114,7 +114,7 @@ def visualize_2d_vector(vec, d_vals=None, d_keys=None, d_limits=None, val_key=No
 
 
 def visualize_2d_vector_wire(vec, d_vals=None, d_keys=None, d_limits=None, val_key=None, val_limits=None, d_ticks=None,
-                             view_init=None, **kwargs):
+                             view_init=None, scatter=False, **kwargs):
     ax = plt.gca(projection='3d')
     ax.patch.set_facecolor('white')
     ax.w_xaxis.set_pane_color((1, 1, 1, 1.0))
@@ -130,7 +130,10 @@ def visualize_2d_vector_wire(vec, d_vals=None, d_keys=None, d_limits=None, val_k
     y = d_vals[1]
     X, Y = np.meshgrid(x, y, indexing='ij')
     Z = vec[sample_mesh]
-    ax.plot_wireframe(X, Y, Z, antialiased=False,  **kwargs)
+    if not scatter:
+        ax.plot_wireframe(X, Y, Z, antialiased=False,  **kwargs)
+    else:
+        ax.scatter(X, Y, Z, **kwargs)
 
     if d_keys is not None:
         ax.set_xlabel(d_keys[0])
@@ -147,7 +150,12 @@ def visualize_2d_vector_wire(vec, d_vals=None, d_keys=None, d_limits=None, val_k
         ax.set_zlim(val_limits)
 
     if view_init is not None:
-        ax.view_init(view_init)
+        if isinstance(view_init, dict):
+            ax.view_init(**view_init)
+        elif type(view_init) in (list, tuple):
+            ax.view_init(*view_init)
+        else:
+            ax.view_init(view_init)
     return ax
 
 
@@ -202,5 +210,10 @@ def visualize_3d_vector(vec, d_vals=None, d_keys=None, d_limits=None, val_key=No
 
     ax.legend(loc="upper left", fancybox=False, shadow=False, frameon=False)
     if view_init is not None:
-        ax.view_init(view_init)
+        if isinstance(view_init, dict):
+            ax.view_init(**view_init)
+        elif type(view_init) in (list, tuple):
+            ax.view_init(*view_init)
+        else:
+            ax.view_init(view_init)
     return ax
