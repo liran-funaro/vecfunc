@@ -27,7 +27,7 @@ setup(
     author_email="liran.funaro+vecfunc@gmail.com",
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    url="https://bitbucket.org/funaro/vecfunc",
+    url="https://github.com/liran-funaro/vecfunc",
     keywords='vector function',
     classifiers=[
         "Programming Language :: Python :: 2",
